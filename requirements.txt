@@ -1,0 +1,8 @@
+streamlit==1.38.0
+numpy==1.26.4
+pandas==2.2.3
+TA-Lib==0.4.32
+joblib==1.4.2
+scikit-learn==1.5.2
+bcrypt==4.2.0
+websocket-client==1.8.0
