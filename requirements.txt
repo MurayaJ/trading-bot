@@ -1,9 +1,0 @@
-streamlit
-pyngrok
-bcrypt
-websocket-client
-numpy
-pandas
-joblib
-scikit-learn
-TA-Lib
