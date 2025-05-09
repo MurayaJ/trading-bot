@@ -25,7 +25,8 @@ DB_PATH = os.path.join(BASE_DIR, "db/trading_users.db")
 GITHUB_PAT = os.environ.get("GITHUB_PAT", "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")
 
 # Construct GitHub repo URL
-GITHUB_REPO_URL = f"https://MurayaJ:{GITHUB_PAT}@github.com/MurayaJ/trading-bot-data.git"
+#GITHUB_REPO_URL = f"https://MurayaJ:{GITHUB_PAT}@github.com/MurayaJ/trading-bot-data.git"
+GITHUB_REPO_URL = "https://github.com/MurayaJ/trading-bot-data.git"
 
 # Ensure directories exist
 os.makedirs(MODEL_DIR, exist_ok=True)
@@ -39,9 +40,11 @@ def init_github_repo():
         if os.path.exists(BASE_DIR):
             if not os.path.exists(os.path.join(BASE_DIR, ".git")):
                 shutil.rmtree(BASE_DIR)  # Remove non-Git directory
-            subprocess.run(["git", "clone", GITHUB_REPO_URL, BASE_DIR], check=True)
-        else:
-            subprocess.run(["git", "clone", GITHUB_REPO_URL, BASE_DIR], check=True)
+
+        # Corrected Cloning Logic
+        subprocess.run(["git", "clone", GITHUB_REPO_URL, BASE_DIR], check=True)
+
+        # Set Git user config (optional but helps in commits)
         subprocess.run(["git", "config", "user.email", "bot@tradingbot.com"], cwd=BASE_DIR, check=True)
         subprocess.run(["git", "config", "user.name", "Trading Bot"], cwd=BASE_DIR, check=True)
     except subprocess.CalledProcessError as e:
