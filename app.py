@@ -21,8 +21,9 @@ BASE_DIR = "trading_bot_data"
 MODEL_DIR = os.path.join(BASE_DIR, "models")
 DB_PATH = os.path.join(BASE_DIR, "db/trading_users.db")
 
-# Get GitHub PAT (uses environment variable with a fallback for testing)
-GITHUB_PAT = os.environ.get("GITHUB_PAT", "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")
+# Get GitHub PAT (uses environment variable stored in Render)
+GITHUB_PAT = os.environ.get("GITHUB_PAT")  
+GITHUB_REPO_URL = f"https://MurayaJ:{GITHUB_PAT}@github.com/MurayaJ/trading-bot-data.git"
 
 # Construct GitHub repo URL
 #GITHUB_REPO_URL = f"https://MurayaJ:{GITHUB_PAT}@github.com/MurayaJ/trading-bot-data.git"
@@ -61,11 +62,12 @@ def sync_with_github():
         st.error(f"Git pull failed: {result.stderr}")
 
 def commit_and_push():
-    """Commit and push changes to GitHub."""
+    """Commit and push changes to GitHub with authentication."""
     subprocess.run(["git", "add", "."], cwd=BASE_DIR, check=True)
     result = subprocess.run(["git", "commit", "-m", "Update models and database"], cwd=BASE_DIR, capture_output=True, text=True)
     if result.returncode == 0 or "nothing to commit" in result.stdout:
-        subprocess.run(["git", "push", "origin", "main"], cwd=BASE_DIR, check=True)
+        # Explicitly set Git authentication
+        subprocess.run(["git", "push", GITHUB_REPO_URL, "main"], cwd=BASE_DIR, check=True)
     else:
         st.error(f"Git commit failed: {result.stderr}")
 
