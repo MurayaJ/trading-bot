@@ -35,24 +35,27 @@ os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)  # Removed extra closing pa
 
 
 # GitHub functions
+import urllib.request
+import zipfile
 def init_github_repo():
-    """Ensure that BASE_DIR is a clone of the GitHub repository."""
+    """Download and extract the GitHub repository instead of cloning."""
     try:
-        if os.path.exists(BASE_DIR):
-            if not os.path.exists(os.path.join(BASE_DIR, ".git")):
-                shutil.rmtree(BASE_DIR)  # Remove non-Git directory
+        # Define the URL for the repo's ZIP file
+        repo_zip_url = "https://github.com/MurayaJ/trading-bot-data/archive/refs/heads/main.zip"
+        zip_path = os.path.join("/app", "trading_bot_data.zip")
 
-        # Corrected Cloning Logic
-        subprocess.run(["git", "clone", GITHUB_REPO_URL, BASE_DIR], check=True)
+        # Download the ZIP file
+        urllib.request.urlretrieve(repo_zip_url, zip_path)
 
-        # Set Git user config (optional but helps in commits)
-        subprocess.run(["git", "config", "user.email", "bot@tradingbot.com"], cwd=BASE_DIR, check=True)
-        subprocess.run(["git", "config", "user.name", "Trading Bot"], cwd=BASE_DIR, check=True)
-    except subprocess.CalledProcessError as e:
-        st.error(f"Failed to initialize GitHub repo: {e}")
-        raise
+        # Extract the ZIP file
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall("/app")
+
+        # Rename extracted folder to match BASE_DIR
+        os.rename("/app/trading-bot-data-main", "/app/trading_bot_data")
+
     except Exception as e:
-        st.error(f"Error in init_github_repo: {e}")
+        st.error(f"Failed to download and extract GitHub repo: {e}")
         raise
 
 def sync_with_github():
