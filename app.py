@@ -20,10 +20,17 @@ import shutil
 BASE_DIR = "trading_bot_data"
 MODEL_DIR = os.path.join(BASE_DIR, "models")
 DB_PATH = os.path.join(BASE_DIR, "db/trading_users.db")
-GITHUB_PAT = os.environ.get("GITHUB_PAT", "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")  # Fallback for testing
+
+# Get GitHub PAT (uses environment variable with a fallback for testing)
+GITHUB_PAT = os.environ.get("GITHUB_PAT", "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")
+
+# Construct GitHub repo URL
 GITHUB_REPO_URL = f"https://MurayaJ:{GITHUB_PAT}@github.com/MurayaJ/trading-bot-data.git"
+
+# Ensure directories exist
 os.makedirs(MODEL_DIR, exist_ok=True)
-os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)  # Removed extra closing parenthesis
+
 
 # GitHub functions
 def init_github_repo():
