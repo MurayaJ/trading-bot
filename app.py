@@ -62,14 +62,22 @@ def sync_with_github():
         st.error(f"Git pull failed: {result.stderr}")
 
 def commit_and_push():
-    """Commit and push changes to GitHub with authentication."""
+    """Commit and push changes to GitHub securely."""
     subprocess.run(["git", "add", "."], cwd=BASE_DIR, check=True)
     result = subprocess.run(["git", "commit", "-m", "Update models and database"], cwd=BASE_DIR, capture_output=True, text=True)
+    
     if result.returncode == 0 or "nothing to commit" in result.stdout:
-        # Explicitly set Git authentication
-        subprocess.run(["git", "push", GITHUB_REPO_URL, "main"], cwd=BASE_DIR, check=True)
+        # Manually configure credentials before pushing
+        subprocess.run(["git", "config", "--global", "credential.helper", "store"], check=True)
+        subprocess.run(["git", "config", "--global", "user.email", "bot@tradingbot.com"], check=True)
+        subprocess.run(["git", "config", "--global", "user.name", "Trading Bot"], check=True)
+        subprocess.run(["git", "remote", "set-url", "origin", f"https://MurayaJ:{os.environ['GITHUB_PAT']}@github.com/MurayaJ/trading-bot.git"], cwd=BASE_DIR, check=True)
+        
+        # Push the changes
+        subprocess.run(["git", "push", "origin", "main"], cwd=BASE_DIR, check=True)
     else:
         st.error(f"Git commit failed: {result.stderr}")
+
 
 # Database functions
 def init_db():
