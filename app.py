@@ -14,6 +14,7 @@ import sqlite3
 import bcrypt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
+import shutil
 
 # Define paths and GitHub URL
 BASE_DIR = "trading_bot_data"
@@ -26,11 +27,22 @@ os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 
 # GitHub functions
 def init_github_repo():
-    """Clone or initialize the GitHub repository."""
-    if not os.path.exists(BASE_DIR):
-        subprocess.run(["git", "clone", GITHUB_REPO_URL, BASE_DIR], check=True)
-    subprocess.run(["git", "config", "user.email", "bot@tradingbot.com"], cwd=BASE_DIR, check=True)
-    subprocess.run(["git", "config", "user.name", "Trading Bot"], cwd=BASE_DIR, check=True)
+    """Ensure that BASE_DIR is a clone of the GitHub repository."""
+    try:
+        if os.path.exists(BASE_DIR):
+            if not os.path.exists(os.path.join(BASE_DIR, ".git")):
+                shutil.rmtree(BASE_DIR)  # Remove non-Git directory
+            subprocess.run(["git", "clone", GITHUB_REPO_URL, BASE_DIR], check=True)
+        else:
+            subprocess.run(["git", "clone", GITHUB_REPO_URL, BASE_DIR], check=True)
+        subprocess.run(["git", "config", "user.email", "bot@tradingbot.com"], cwd=BASE_DIR, check=True)
+        subprocess.run(["git", "config", "user.name", "Trading Bot"], cwd=BASE_DIR, check=True)
+    except subprocess.CalledProcessError as e:
+        st.error(f"Failed to initialize GitHub repo: {e}")
+        raise
+    except Exception as e:
+        st.error(f"Error in init_github_repo: {e}")
+        raise
 
 def sync_with_github():
     """Pull latest changes from GitHub."""
